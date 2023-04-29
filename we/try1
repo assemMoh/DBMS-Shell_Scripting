@@ -1,0 +1,8 @@
+name;age;pk-id;status;gender;
+str;int;int;str;bool;
+assem;25;1;fine;M;
+arwa;30;2;ok;M;
+ali;15;3;ok;M;
+ola;23;4;okay;F;
+amr;27;5;notok;M;
+arwa;40;6;dk;M;

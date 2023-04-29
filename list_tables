@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo "______________"
+ls ./$current_db -1 | awk '{print "|"$1}' 
+echo "______________"
+
+
+

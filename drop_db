@@ -1,0 +1,22 @@
+#!/bin/bash
+
+
+read -p "Enter database name: " dname
+
+if test $dname == "$cancelVal"
+then 
+	echo "Process cancelled.."
+	exit
+fi
+
+if test -d $dname
+then
+	touch temp.txt
+	awk '{if($0 != d_name) print $0}' d_name="$dname" databases.txt >> temp.txt
+	rm databases.txt
+	mv temp.txt databases.txt
+	rm -r $dname
+	echo "Database deleted!"
+else
+	echo "This database is not found!"
+fi

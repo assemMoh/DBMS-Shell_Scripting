@@ -1,0 +1,26 @@
+#!/bin/bash
+
+
+
+read -p "Enter name of table to drop (type 'ret' to cancel): " tname
+
+if test $tname = $cancelVal
+then echo "Process cancelled.."
+exit 0
+
+elif test -f ./$current_db/$tname
+then
+read -p "Are your sure you want to delete $tname table? (y/n) " ans
+
+if test $ans = "y"
+then rm ./$current_db/$tname
+echo "Table deleted! "
+else echo "Process cancelled"
+fi
+
+else echo "Table not found!"
+
+
+fi
+
+

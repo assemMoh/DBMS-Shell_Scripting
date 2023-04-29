@@ -1,0 +1,16 @@
+#!/bin/bash
+shopt -s extglob
+touch okay.txt
+echo "aklafklaf" >> okay.txt
+rm okay.txt
+array="FM"
+echo $1
+case "$1" in
+	@([MF]) ) echo "bool" ;;
+	+([a-zA-Z]) ) echo "is a string" ;;
+	+([0-9]) ) echo "integer" ;;
+	* ) echo "invalid" ;;
+esac
+x="pineapple"
+y="apple"
+awk 'BEGIN{if(match(v1,v2)){print 1}}' v1="$x" v2="$y"

@@ -1,0 +1,4 @@
+name;pk-id;age;gender;
+str;int;int;bool;
+ola;3;25;null;
+ali;4;30;M;

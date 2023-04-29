@@ -1,0 +1,66 @@
+#!/bin/bash
+
+function checkRET()
+{
+	if [ "$1" == "$cancelVal" ]
+		then echo "Process cancelled.."
+		exit 0
+	fi
+}
+
+
+read -p "Enter table to update in (type 'ret' to cancel): " tname
+
+checkRET $tname
+
+if test -f $current_db/$tname
+then
+	cols=$( sed -n '1p' $current_db/$tname )
+	col_names=(${cols//';'/' '})	
+	read -p "Enter column you want to update: " col
+	checkRET $col
+	if [[ "${col_names[*]}" =~ "$col" ]]
+	then
+		read -p "set $col = " val
+		checkRET $val
+
+		colInfo=$(head -n 1 $current_db/$tname | awk 'BEGIN{FS=";"} {for(i=1;i<=NF;i++){print $i, i}}' | awk '{if (match($1, targetCol))print $1,$2}' targetCol="$col")
+		targetColInfo=(${colInfo//" "/" "})
+		fieldName=${targetColInfo[0]}
+		attName=(${fieldName//"-"/' '})
+		
+		fieldNo=${targetColInfo[1]}
+
+		if test ${#attName[@]} -eq 2	
+		then
+			pk_string=$( sed 1,2d $current_db/$tname | awk 'BEGIN{FS=";"} {print $target_i}' target_i="$fieldNo" )
+			pk_values=(${pk_string//' '/' '})
+			if [[ "${pk_values[*]}" =~ "$val" ]]
+			then
+				echo "As you are updating in the PK field, this value is taken. Process cancelled.."
+				exit
+			fi
+		fi	
+		read -p "where (enter column to set condition on): " col2
+		checkRET $col2
+			
+		if [[ "${col_names[*]}" =~ "$col2" ]]
+		then
+			colInd=$(head -n 1 $current_db/$tname | awk 'BEGIN{FS=";"} {for(i=1;i<=NF;i++){print $i, i}}' | awk '{if (match($1, targCol))print $2}' targCol="$col2")
+			read -p "where $col2 = " val2
+			touch temp.txt
+			head -n 2 $current_db/$tname >> temp.txt
+			sed 1,2d $current_db/$tname | awk 'BEGIN{FS=";"} {if ($checkCol == checkVal){sub($tCol, tVal, $0)} print $0}  ' tCol="$fieldNo" tVal="$val" checkVal="$val2" checkCol="$colInd" >> temp.txt
+			rm $current_db/$tname
+			mv temp.txt $current_db/$tname
+			echo "Columns updated successfully.."
+		else
+			echo "Column not found. Process cancelled.."	
+		fi	
+
+	else
+		echo "column not found!"
+	fi
+else
+	echo "Table not found."
+fi

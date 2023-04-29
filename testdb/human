@@ -1,0 +1,5 @@
+name;pk-id;age;gender;
+str;int;int;bool;
+assem;1;25;M;
+xxx;2;30;M;
+xxx;3;30;M;

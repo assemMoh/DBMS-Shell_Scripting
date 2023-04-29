@@ -1,0 +1,36 @@
+#!/bin/bash
+
+function checkRET()
+{
+	if [ "$1" == "$cancelVal" ]
+		then echo "Process cancelled.."
+		exit 0
+	fi
+}
+
+
+read -p "Enter table to delete from (type 'ret' to cancel): " tname
+
+checkRET $tname
+
+if test -f $current_db/$tname
+then
+	cols=$( sed -n '1p' $current_db/$tname )
+	col_names=(${cols//';'/' '})	
+	read -p "Enter column to place condition on: " col
+	checkRET $col
+	if [[ "${col_names[*]}" =~ "$col" ]]
+	then
+		read -p "your are deleting from $tname where $col = " val
+		indOfCol=$(head -n 1 $current_db/$tname | awk 'BEGIN{FS=";"} {for(i=1;i<=NF;i++){print $i, i}}' | awk '{if (match($1, targetCol))print $2}' targetCol="$col")
+		touch temp.txt
+		awk 'BEGIN{FS=";"} {for(i=1;i<=NF;i++){if (i == targetColInd && $i != targetVal) print $0}}' targetColInd="$indOfCol" targetVal="$val" $current_db/$tname >> temp.txt
+		rm $current_db/$tname
+		mv temp.txt $current_db/$tname
+		echo "Record(s) deleted!"
+	else
+		echo "column not found!"
+	fi
+else
+	echo "Table not found."
+fi

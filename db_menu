@@ -1,0 +1,25 @@
+#!/bin/bash
+
+PS3="$1 > "
+
+export current_db="$1"
+
+select op in "create table" "list tables" "drop table" "insert into table" "select from table" "delete from table" "update table" "disconnect"
+do
+
+case $op in
+"create table") create_table ;;
+"list tables") list_tables ;;
+"drop table") drop_table ;;
+"insert into table") insert ;;
+"delete from table") delete ;;
+"update table") update ;;
+"disconnect") echo "Disconnected"; exit ;;
+"select from table") Select;;
+*) echo "invalid choice" ;;
+esac
+
+done
+
+
+

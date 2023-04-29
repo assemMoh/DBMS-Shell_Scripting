@@ -1,0 +1,18 @@
+#!/bin/bash
+
+PS3="Your choice(main menu): " 
+
+
+select op in "create database" "list databases" "drop database" "connect to database" "Exit"
+do
+
+case $op in
+"create database") create_db ;;
+"list databases") list_db ;;
+"drop database") drop_db ;;
+"connect to database") connect_db ;;
+"Exit") break;;
+*) echo "Invalid choice" ;;
+esac
+
+done

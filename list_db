@@ -1,0 +1,4 @@
+#!/bin/bash
+
+awk 'BEGIN{print"______________"}{print "|"$1} END{print "______________\n"}' databases.txt
+

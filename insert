@@ -1,0 +1,89 @@
+#!/bin/bash
+shopt -s extglob
+
+function checkRET()
+{
+	if [ "$1" == "$cancelVal" ]
+		then echo "Process cancelled.."
+		exit 0
+	fi
+}
+
+
+
+read -p "Enter table to insert into (type 'ret' to cancel): " tname
+
+checkRET $tname
+
+if test -f $current_db/$tname
+then
+
+
+	cols=$( sed -n '1p' $current_db/$tname )
+	array=(${cols//';'/' '})
+
+	dtypes=$( sed -n '2p' $current_db/$tname )
+	array2=(${dtypes//';'/' '})
+
+	new_data=""
+	typeOfEntry=""
+	error="0"
+	typeset -i index
+	index=1
+	for ind in ${!array[*]}
+	do
+		read -p "Enter ${array[$ind]} (${array2[$ind]}) (type 'ret' to cancel, 'enter' to save null): " data
+		
+		checkRET $data
+		case $data in
+			@([MF])		 ) typeOfEntry="bool" ;;
+			+([a-zA-Z])	 ) typeOfEntry="str" ;;
+			+([0-9])	 ) typeOfEntry="int" ;;
+			*		 ) typeOfEntry=""  ;;
+		esac
+		if test "$typeOfEntry" = "${array2[$ind]}" -o -z "$data"
+		then
+			current_col=${array[$ind]}
+			check_pk=(${current_col//'-'/' '})
+
+			if test ${#check_pk[@]} -eq 2
+			then
+				if test -z $data
+				then
+					echo "PK attribute can't be null, process cancelled.."
+					error="1"
+					break
+				fi
+				pk_string=$( sed 1,2d $current_db/$tname | awk 'BEGIN{FS=";"} {print $target_i}' target_i="$index" )
+				pk_values=(${pk_string//' '/' '})
+				if [[ "${pk_values[*]}" =~ "$data" ]]
+				then
+					echo "As this is a PK value, it can't be duplicated. Process cancelled.."
+					error="1"
+					break
+				fi
+			fi
+			if test -z $data
+			then 
+				new_data=$new_data"null;"
+			else
+				new_data=$new_data$data";"
+			fi
+		else
+			echo "Invalid data type. Process cancelled.."
+			error="1"
+			break 
+		fi
+		let index=index+1
+	done
+	
+	if [ "$error" = "0" ]
+	then
+		echo $new_data >> $current_db/$tname
+		echo "Record saved!"
+	fi
+
+
+else 
+	echo "Table not found!"
+fi

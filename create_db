@@ -1,0 +1,19 @@
+#!/bin/bash
+
+
+read -p "Enter database name: " dname
+
+if test $dname == "$cancelVal"
+then 
+	echo "Process cancelled.."
+	exit
+fi
+
+if test -d $dname
+then
+	echo "This database already exists. Try another name."
+else
+	mkdir $dname
+	echo $dname >> databases.txt
+	echo "Database created!"
+fi

@@ -1,0 +1,80 @@
+#!/bin/bash
+
+function checkRET()
+{
+	if [ "$1" == "$cancelVal" ]
+		then echo "Process cancelled.."
+		exit 0
+	fi
+}
+f="0"
+read -p "Enter table name (type 'ret' to cancel): " tname
+
+checkRET $tname
+if test -f $current_db/$tname
+	then echo "This table is already created"
+
+else
+
+	done="0"
+	atts=""
+	types=""
+	pk=""
+	while [ "$done" == "0" ]
+	do
+		read -p "add column (type 'save' to save, 'ret' to cancel): " entry
+
+		checkRET $entry   
+		if [[ $atts =~ $entry ]]
+		then
+			 echo "You have entered this column."
+			 continue
+		fi
+		if test -z entry
+		then 
+			echo "Table name can't be null"
+		else
+		
+			if [ "$entry" != "save" ]
+			then
+				read -p "Enter column datatype (int, str, bool): " dtype
+	
+				checkRET $dtype
+				if test "$dtype" = "int" -o "$dtype" = "str" -o "$dtype" = "bool"
+				then
+					if test -z $pk 
+					then
+						read -p "Choose this column as primary key? (y/n) " ans
+						if [ $ans = "y" ]
+						then
+							pk=$entry
+							atts=$atts$"pk-"
+						fi
+					fi
+					atts=$atts$entry";"
+					types=$types$dtype";"
+					f="1"
+				else
+					echo "Invalid data type, column is not saved. Enter again."
+				fi	
+				
+				 
+			else
+				 done="1"
+				fi
+		fi
+
+	done
+	if test "$f" == "1"
+	then
+		touch $current_db/$tname
+		echo "Table created and saved!"	
+		echo $atts >> $current_db/$tname
+		echo $types >> $current_db/$tname
+	else
+		echo "You didn't add any column(s), table not saved."
+	fi
+fi 
+
+
+

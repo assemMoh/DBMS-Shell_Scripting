@@ -1,0 +1,79 @@
+#!/bin/bash
+
+function checkRET {
+if [ "$1" == "$cancelVal" ]
+then echo "Process cancelled.."
+exit 1
+fi
+}
+
+found="0"
+password=""
+while [ "$found" == "0" ]
+do
+
+read -p "Enter username (type 'ret' to cancel): " uname
+
+checkRET $uname
+
+found=$(awk 'BEGIN{FS=":"} {if($1 == name) {print $2;exit}}' name="$uname" /home/assem/dbms/users.txt)
+
+if [ -z $found ]
+then
+echo "This username not found!"
+found="0"
+else
+password=$found
+found="1"
+fi
+
+done
+
+
+found="0"
+
+
+entered_pass=""
+while [ "$found" == "0" ]
+do
+read -p "Enter your password (type 'ret' to cancel): " entered_pass
+
+checkRET $entered_pass
+
+if [ "$password" != "$entered_pass" ]
+then
+echo "Wrong password! "
+else found="1"
+fi
+
+done
+
+
+echo "Welcome, $uname"
+
+found="0"
+while [ "$found" == "0" ]
+do
+
+read -p "Enter database name to connect (type 'ret' to cancel): " db_name
+
+checkRET $db_name
+
+if test -d $db_name
+then
+found="1"
+else
+echo "This database is not found!"
+fi
+
+done
+
+
+echo "Your are now connect to $db_name "
+db_menu $db_name
+
+
+
+
+
+
